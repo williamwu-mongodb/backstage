@@ -39,7 +39,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "config.d.ts"
   ],
   "scripts": {
     "build": "backstage-cli package build",
@@ -82,5 +83,6 @@
     "@types/react": {
       "optional": true
     }
-  }
+  },
+  "configSchema": "config.d.ts"
 }

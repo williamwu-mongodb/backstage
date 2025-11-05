@@ -37,6 +37,7 @@ export const devtoolsPlugin = createBackendPlugin({
         httpRouter: coreServices.httpRouter,
         discovery: coreServices.discovery,
         httpAuth: coreServices.httpAuth,
+        auth: coreServices.auth,
         permissionsRegistry: coreServices.permissionsRegistry,
       },
       async init({
@@ -46,6 +47,7 @@ export const devtoolsPlugin = createBackendPlugin({
         httpRouter,
         discovery,
         httpAuth,
+        auth,
         permissionsRegistry,
       }) {
         httpRouter.use(
@@ -55,6 +57,7 @@ export const devtoolsPlugin = createBackendPlugin({
             permissions,
             discovery,
             httpAuth,
+            auth,
           }),
         );
         httpRouter.addAuthPolicy({

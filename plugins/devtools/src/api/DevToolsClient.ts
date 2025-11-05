@@ -19,6 +19,8 @@ import {
   ConfigInfo,
   DevToolsInfo,
   ExternalDependency,
+  ScheduledTasks,
+  TriggerScheduledTask,
 } from '@backstage/plugin-devtools-common';
 import { ResponseError } from '@backstage/errors';
 import { DevToolsApi } from './DevToolsApi';
@@ -40,6 +42,25 @@ export class DevToolsClient implements DevToolsApi {
 
     const configInfo = await this.get<ConfigInfo | undefined>(urlSegment);
     return configInfo;
+  }
+
+  public async getScheduledTasksByPlugin(
+    plugin: string,
+  ): Promise<ScheduledTasks> {
+    const urlSegment = `scheduled-tasks/${plugin}`;
+
+    const scheduledTasks = await this.get<ScheduledTasks>(urlSegment);
+    return scheduledTasks;
+  }
+
+  public async triggerScheduledTask(
+    plugin: string,
+    taskId: string,
+  ): Promise<TriggerScheduledTask> {
+    const urlSegment = `scheduled-tasks/${plugin}/${taskId}/trigger`;
+
+    const triggerResponse = await this.post<TriggerScheduledTask>(urlSegment);
+    return triggerResponse;
   }
 
   public async getExternalDependencies(): Promise<
@@ -65,6 +86,21 @@ export class DevToolsClient implements DevToolsApi {
     const url = new URL(path, baseUrl);
 
     const response = await this.fetchApi.fetch(url.toString());
+
+    if (!response.ok) {
+      throw await ResponseError.fromResponse(response);
+    }
+
+    return response.json() as Promise<T>;
+  }
+
+  private async post<T>(path: string): Promise<T> {
+    const baseUrl = `${await this.discoveryApi.getBaseUrl('devtools')}/`;
+    const url = new URL(path, baseUrl);
+
+    const response = await this.fetchApi.fetch(url.toString(), {
+      method: 'POST',
+    });
 
     if (!response.ok) {
       throw await ResponseError.fromResponse(response);
