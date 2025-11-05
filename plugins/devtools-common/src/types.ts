@@ -21,8 +21,9 @@ import { JsonObject, JsonValue } from '@backstage/types';
 /**
  * The shape of a task definition as returned by the service's REST API.
  * Taken from packages/backend-defaults/src/entrypoints/scheduler/lib/types.ts
+ *
  */
-export interface TaskApiTasksResponse {
+export type TaskApiTasksResponse = {
   taskId: string;
   pluginId: string;
   scope: 'global' | 'local';
@@ -53,7 +54,7 @@ export interface TaskApiTasksResponse {
         status: 'running';
       }
     | null;
-}
+};
 
 /** @public */
 export type Endpoint = {
