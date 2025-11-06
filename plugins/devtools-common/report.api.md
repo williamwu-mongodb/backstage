@@ -97,9 +97,7 @@ export type ScheduledTasks = {
   error?: string;
 };
 
-// Warning: (ae-missing-release-tag) "TaskApiTasksResponse" is part of the package's API, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-//
-// @public
+// @public (undocumented)
 export type TaskApiTasksResponse = {
   taskId: string;
   pluginId: string;

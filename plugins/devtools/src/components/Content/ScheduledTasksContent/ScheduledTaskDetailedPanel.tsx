@@ -41,6 +41,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+/** @public */
 export const ScheduledTaskDetailPanel = ({
   rowData,
 }: {
