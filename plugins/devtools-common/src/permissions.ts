@@ -60,7 +60,7 @@ export const devToolsTaskSchedulerReadPermission = createPermission({
  * @public
  */
 export const devToolsTaskSchedulerCreatePermission = createPermission({
-  name: 'devtools.external-dependencies',
+  name: 'devtools.task-scheduler',
   attributes: { action: 'create' },
 });
 

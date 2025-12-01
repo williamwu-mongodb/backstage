@@ -16,41 +16,8 @@
 /* We want to maintain the same information as an enum, so we disable the redeclaration warning */
 /* eslint-disable @typescript-eslint/no-redeclare */
 
-import { JsonObject, JsonValue } from '@backstage/types';
-
-/** @public */
-export type TaskApiTasksResponse = {
-  taskId: string;
-  pluginId: string;
-  scope: 'global' | 'local';
-  settings: { version: number } & JsonObject;
-  taskState:
-    | {
-        status: 'running';
-        startedAt: string;
-        timesOutAt?: string;
-        lastRunError?: string;
-        lastRunEndedAt?: string;
-      }
-    | {
-        status: 'idle';
-        startsAt?: string;
-        lastRunError?: string;
-        lastRunEndedAt?: string;
-      }
-    | null;
-  workerState:
-    | {
-        status: 'initial-wait';
-      }
-    | {
-        status: 'idle';
-      }
-    | {
-        status: 'running';
-      }
-    | null;
-};
+import { JsonValue } from '@backstage/types';
+import { TaskApiTasksResponse } from '@backstage/backend-defaults';
 
 /** @public */
 export type Endpoint = {

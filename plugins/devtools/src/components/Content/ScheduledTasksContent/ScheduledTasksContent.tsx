@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React, { useState } from 'react';
+
+import { useState, useMemo } from 'react';
 import Box from '@material-ui/core/Box';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import debounce from '@material-ui/core/debounce';
+import TextField from '@material-ui/core/TextField';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { Progress, Table, TableColumn } from '@backstage/core-components';
 import Alert from '@material-ui/lab/Alert';
 import { useScheduledTasks, useTriggerScheduledTask } from '../../../hooks';
-import { TaskApiTasksResponse } from '@backstage/plugin-devtools-common';
+import { TaskApiTasksResponse } from '@backstage/backend-defaults/scheduler';
 import { alertApiRef, configApiRef, useApi } from '@backstage/core-plugin-api';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import NightsStay from '@material-ui/icons/NightsStay';
@@ -90,10 +90,25 @@ export const ScheduledTasksContent = () => {
   const classes = useStyles();
   const configApi = useApi(configApiRef);
   const alertApi = useApi(alertApiRef);
-  const plugins = configApi.getStringArray('devTools.scheduledTasks.plugins');
+  const plugins =
+    configApi.getOptionalStringArray('devTools.scheduledTasks.plugins') || [];
   const [selectedPlugin, setSelectedPlugin] = useState(plugins[0] || '');
   const { scheduledTasks, loading, error } = useScheduledTasks(selectedPlugin);
   const { triggerTask, isTriggering, triggerError } = useTriggerScheduledTask();
+
+  const [inputValue, setInputValue] = useState('');
+
+  const handleInputChangeDebounced = useMemo(
+    () =>
+      debounce((newInputValue: string) => {
+        setSelectedPlugin(newInputValue);
+      }, 500),
+    [setSelectedPlugin],
+  );
+
+  const handleAutocompleteChange = (_event: any, newValue: string | null) => {
+    setSelectedPlugin(newValue || '');
+  };
 
   if (!plugins || plugins.length === 0) {
     return (
@@ -103,10 +118,6 @@ export const ScheduledTasksContent = () => {
       </Alert>
     );
   }
-
-  const handlePluginChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setSelectedPlugin(event.target.value as string);
-  };
 
   const columns: TableColumn<TaskApiTasksResponse>[] = [
     {
@@ -210,22 +221,24 @@ export const ScheduledTasksContent = () => {
 
   return (
     <Box>
-      <FormControl variant="outlined" className={classes.formControl}>
-        <InputLabel id="plugin-select-label">Select Plugin</InputLabel>
-        <Select
-          labelId="plugin-select-label"
-          id="plugin-select"
-          value={selectedPlugin}
-          onChange={handlePluginChange}
-          label="Select Plugin"
-        >
-          {plugins.map(plugin => (
-            <MenuItem key={plugin} value={plugin}>
-              {plugin}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <Autocomplete
+        className={classes.formControl}
+        freeSolo
+        options={plugins}
+        value={selectedPlugin}
+        inputValue={inputValue}
+        onChange={handleAutocompleteChange}
+        onInputChange={(_event, newInputValue, reason) => {
+          setInputValue(newInputValue);
+          // Only run debounce logic when the user is actively typing or clearing the input
+          if (reason === 'input' || reason === 'clear') {
+            handleInputChangeDebounced(newInputValue);
+          }
+        }}
+        renderInput={params => (
+          <TextField {...params} label="Select Plugin" variant="outlined" />
+        )}
+      />
 
       {loading && <Progress />}
 

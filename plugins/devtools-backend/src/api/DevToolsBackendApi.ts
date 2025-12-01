@@ -23,8 +23,6 @@ import {
   ExternalDependency,
   ExternalDependencyStatus,
   PackageDependency,
-  ScheduledTasks,
-  TriggerScheduledTask,
 } from '@backstage/plugin-devtools-common';
 import { JsonObject } from '@backstage/types';
 import { findPaths } from '@backstage/cli-common';
@@ -36,105 +34,15 @@ import { Lockfile } from '../util/Lockfile';
 import { memoize } from 'lodash';
 import { assertError } from '@backstage/errors';
 import { LoggerService } from '@backstage/backend-plugin-api';
-import { TaskApiTasksResponse } from '@backstage/plugin-devtools-common';
 
 /** @public */
 export class DevToolsBackendApi {
   private readonly logger: LoggerService;
   private readonly config: Config;
-  private static readonly SCHEDULED_TASKS_PATH =
-    '.backstage/scheduler/v1/tasks';
 
   public constructor(logger: LoggerService, config: Config) {
     this.logger = logger;
     this.config = config;
-  }
-
-  public async triggerScheduledTask(
-    plugin: string,
-    taskId: string,
-    token: string,
-  ): Promise<TriggerScheduledTask> {
-    const backendUrl = this.config.getString('backend.baseUrl');
-    const triggerTaskUrl = `${backendUrl}/api/${plugin}/${DevToolsBackendApi.SCHEDULED_TASKS_PATH}/${taskId}/trigger`;
-
-    try {
-      this.logger.info(
-        `Triggering scheduled task "${taskId}" for plugin "${plugin}" via "${triggerTaskUrl}"`,
-      );
-
-      const response = await fetch(triggerTaskUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorMessage = `Failed to trigger scheduled task "${taskId}" for plugin "${plugin}" - ${response.status} ${response.statusText}`;
-        this.logger.error(errorMessage);
-        return {
-          error: errorMessage,
-        };
-      }
-
-      this.logger.info(
-        `Successfully triggered scheduled task "${taskId}" for plugin "${plugin}"`,
-      );
-    } catch (e) {
-      const errorMessage = `An error occurred while triggering task "${taskId}" for plugin "${plugin}": ${e.message}`;
-      this.logger.error(errorMessage);
-      return {
-        error: errorMessage,
-      };
-    }
-    return {
-      error: undefined,
-    };
-  }
-
-  public async getScheduledTasksByPlugin(
-    plugin: string,
-    token: string,
-  ): Promise<ScheduledTasks> {
-    const backendUrl = this.config.getString('backend.baseUrl');
-    const scheduledTasksUrl = `${backendUrl}/api/${plugin}/${DevToolsBackendApi.SCHEDULED_TASKS_PATH}`;
-
-    try {
-      this.logger.info(
-        `Retrieving scheduled tasks for plugin "${plugin}" from "${scheduledTasksUrl}"`,
-      );
-
-      const response = await fetch(scheduledTasksUrl, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorMessage = `Failed to retrieve scheduled tasks for plugin "${plugin}" - ${response.status} ${response.statusText}`;
-        this.logger.error(errorMessage);
-        return {
-          scheduledTasks: undefined,
-          error: errorMessage,
-        };
-      }
-
-      const { tasks } = await response.json();
-      return {
-        scheduledTasks: tasks as TaskApiTasksResponse[],
-        error: undefined,
-      };
-    } catch (e) {
-      const errorMessage = `An error occurred for "${plugin}" plugin: ${e.message}`;
-      this.logger.error(errorMessage);
-      return {
-        scheduledTasks: undefined,
-        error: errorMessage,
-      };
-    }
   }
 
   public async listExternalDependencyDetails(): Promise<ExternalDependency[]> {

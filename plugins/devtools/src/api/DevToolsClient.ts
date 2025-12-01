@@ -47,20 +47,40 @@ export class DevToolsClient implements DevToolsApi {
   public async getScheduledTasksByPlugin(
     plugin: string,
   ): Promise<ScheduledTasks> {
-    const urlSegment = `scheduled-tasks/${plugin}`;
+    const baseUrl = `${await this.discoveryApi.getBaseUrl(plugin)}/`;
+    const url = new URL('.backstage/scheduler/v1/tasks', baseUrl);
 
-    const scheduledTasks = await this.get<ScheduledTasks>(urlSegment);
-    return scheduledTasks;
+    const response = await this.fetchApi.fetch(url.toString());
+
+    if (!response.ok) {
+      throw await ResponseError.fromResponse(response);
+    }
+
+    const scheduledTasks = await response.json();
+    return {
+      scheduledTasks: scheduledTasks.tasks,
+    };
   }
 
   public async triggerScheduledTask(
     plugin: string,
     taskId: string,
   ): Promise<TriggerScheduledTask> {
-    const urlSegment = `scheduled-tasks/${plugin}/${taskId}/trigger`;
+    const baseUrl = `${await this.discoveryApi.getBaseUrl(plugin)}/`;
+    const url = new URL(
+      `.backstage/scheduler/v1/tasks/${taskId}/trigger`,
+      baseUrl,
+    );
 
-    const triggerResponse = await this.post<TriggerScheduledTask>(urlSegment);
-    return triggerResponse;
+    const response = await this.fetchApi.fetch(url.toString(), {
+      method: 'POST',
+    });
+
+    if (!response.ok) {
+      throw await ResponseError.fromResponse(response);
+    }
+
+    return response.json() as Promise<TriggerScheduledTask>;
   }
 
   public async getExternalDependencies(): Promise<
@@ -86,21 +106,6 @@ export class DevToolsClient implements DevToolsApi {
     const url = new URL(path, baseUrl);
 
     const response = await this.fetchApi.fetch(url.toString());
-
-    if (!response.ok) {
-      throw await ResponseError.fromResponse(response);
-    }
-
-    return response.json() as Promise<T>;
-  }
-
-  private async post<T>(path: string): Promise<T> {
-    const baseUrl = `${await this.discoveryApi.getBaseUrl('devtools')}/`;
-    const url = new URL(path, baseUrl);
-
-    const response = await this.fetchApi.fetch(url.toString(), {
-      method: 'POST',
-    });
 
     if (!response.ok) {
       throw await ResponseError.fromResponse(response);

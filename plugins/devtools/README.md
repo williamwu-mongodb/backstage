@@ -34,6 +34,19 @@ Lists the configuration being used by your current running Backstage instance.
 
 ![Example of Config tab](./docs/devtools-config-tab.png)
 
+### Scheduled Tasks
+
+Scheduled tasks can be viewed and triggered under the `Scheduled Tasks` tab. You first must add the list of plugins for scheduled tasks to your config:
+
+```yaml
+devTools:
+  scheduledTasks:
+    plugins:
+      - catalog
+```
+
+![Example of Scheduled Tasks tab](./docs/devtools-scheduled-tasks-tab.png)
+
 ## Optional Features
 
 The DevTools plugin can be setup with other tabs with additional helpful features.
@@ -455,38 +468,4 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
     apt-get install -y  ... iputils-ping
-```
-
-### Scheduled Tasks Configuration
-
-Scheduled tasks can be viewed and triggered in the DevTools plugin under the `Scheduled Tasks` tab. You first must add the list of plugins for scheduled tasks to your config:
-
-```yaml
-devTools:
-  scheduledTasks:
-    plugins:
-      - catalog
-```
-
-Then add a new `DevToolsLayout.Route` to the end of your `DevToolsLayout` in your `CustomDevToolsPage.tsx` like this:
-
-```diff
-  <DevToolsLayout>
-    <DevToolsLayout.Route path="info" title="Info">
-      <InfoContent />
-    </DevToolsLayout.Route>
-    <DevToolsLayout.Route path="config" title="Config">
-      <ConfigContent />
-    </DevToolsLayout.Route>
-    <DevToolsLayout.Route
-      path="external-dependencies"
-      title="External Dependencies"
-    >
-      <ExternalDependenciesContent />
-    </DevToolsLayout.Route>
-+   <DevToolsLayout.Route path="scheduled-tasks" title="Scheduled Tasks">
-+     <ScheduledTasksContent />
-+   </DevToolsLayout.Route>
-  </DevToolsLayout>
-``
 ```
