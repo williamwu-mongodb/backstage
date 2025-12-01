@@ -5462,6 +5462,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@backstage/plugin-devtools-common@workspace:plugins/devtools-common"
   dependencies:
+    "@backstage/backend-defaults": "workspace:^"
     "@backstage/cli": "workspace:^"
     "@backstage/plugin-permission-common": "workspace:^"
     "@backstage/types": "workspace:^"
@@ -5472,6 +5473,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@backstage/plugin-devtools@workspace:plugins/devtools"
   dependencies:
+    "@backstage/backend-defaults": "workspace:^"
     "@backstage/cli": "workspace:^"
     "@backstage/core-components": "workspace:^"
     "@backstage/core-plugin-api": "workspace:^"
