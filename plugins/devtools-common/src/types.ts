@@ -17,7 +17,7 @@
 /* eslint-disable @typescript-eslint/no-redeclare */
 
 import { JsonValue } from '@backstage/types';
-import { TaskApiTasksResponse } from '@backstage/backend-defaults';
+import { TaskApiTasksResponse } from '@backstage/backend-defaults/scheduler';
 
 /** @public */
 export type Endpoint = {
