@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
-import debounce from 'lodash';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { Progress, Table, TableColumn } from '@backstage/core-components';
 import Alert from '@material-ui/lab/Alert';
@@ -98,16 +97,23 @@ export const ScheduledTasksContent = () => {
 
   const [inputValue, setInputValue] = useState('');
 
-  const handleInputChangeDebounced = useMemo(
-    () =>
-      debounce((newInputValue: string) => {
-        setSelectedPlugin(newInputValue);
-      }, 500),
-    [setSelectedPlugin],
-  );
-
   const handleAutocompleteChange = (_event: any, newValue: string | null) => {
     setSelectedPlugin(newValue || '');
+  };
+
+  const handleCommitChange = () => {
+    if (inputValue !== selectedPlugin) {
+      setSelectedPlugin(inputValue);
+    }
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      handleCommitChange();
+      // Prevent Autocomplete's default behavior (which might select a filtered item)
+      event.preventDefault();
+      event.stopPropagation();
+    }
   };
 
   if (!plugins || plugins.length === 0) {
@@ -223,20 +229,23 @@ export const ScheduledTasksContent = () => {
     <Box>
       <Autocomplete
         className={classes.formControl}
+        classes={{ root: classes.formControl }}
         freeSolo
         options={plugins}
         value={selectedPlugin}
         inputValue={inputValue}
         onChange={handleAutocompleteChange}
-        onInputChange={(_event, newInputValue, reason) => {
+        onInputChange={(_event, newInputValue) => {
           setInputValue(newInputValue);
-          // Only run debounce logic when the user is actively typing or clearing the input
-          if (reason === 'input' || reason === 'clear') {
-            handleInputChangeDebounced(newInputValue);
-          }
         }}
         renderInput={params => (
-          <TextField {...params} label="Select Plugin" variant="outlined" />
+          <TextField
+            {...params}
+            label="Select Plugin"
+            variant="outlined"
+            onKeyDown={handleKeyDown}
+            onBlur={handleCommitChange}
+          />
         )}
       />
 
