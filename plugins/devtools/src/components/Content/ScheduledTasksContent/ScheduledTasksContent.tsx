@@ -21,8 +21,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
-// @ts-ignore
-import debounce from '@material-ui/core/debounce';
+import debounce from 'lodash';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { Progress, Table, TableColumn } from '@backstage/core-components';
 import Alert from '@material-ui/lab/Alert';
