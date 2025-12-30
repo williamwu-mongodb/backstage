@@ -50,6 +50,8 @@ The documentation of Backstage includes:
 
 ## Community
 
+test
+
 To engage with our community, you can use the following resources:
 
 - [Discord chatroom](https://discord.gg/backstage-687207715902193673) - Get support or discuss the project
