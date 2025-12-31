@@ -1,6 +1,6 @@
 # Introduction
 
-This file provides pointers for reviewing pull requests. While the main audience are reviewers, this can also be useful if you are contributing to this repository.
+This file provides pointers for reviewing pull requests. While the main audience are reviewers, this can also be useful if you are contributing to this repository... like I am right now.
 
 ## Code Style
 
